@@ -1,0 +1,91 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {    
+      "name": {
+          "type": "string",
+          "metadata": {
+              "description": "Name for the container group"
+          },
+          "defaultValue": "sql-test-ps-group"
+      },    
+      "image": {        
+          "type": "string",
+          "metadata": {
+              "description": "Container image to deploy. Should be of the form accountName/imagename:tag for images stored in Docker Hub or a fully qualified URI for a private registry like the Azure Container Registry."
+          },
+          "defaultValue": "danielscholl/sql-test-ps:linux"
+      },   
+      "dbHost": {
+          "type": "string",
+          "metadata": {
+              "description": "Database Host Name"
+          }
+      },
+      "dbName": {
+            "type": "string",
+            "metadata": {
+                "description": "Database Name"
+            }
+      },
+      "dbUser": {
+          "type": "string",
+          "metadata": {
+              "description": "SA UserName"
+          }
+      },
+      "dbPassword": {
+          "type": "string",
+          "metadata": {
+              "description": "SA Password"
+          }
+      }
+    },
+    "variables": {
+        "cpuCores": "1.0",
+        "memoryInGb": "1.5",
+        "dbHost": "[concat('Data Source=', parameters('dbHost'), ',1433;')]",
+        "dbName": "[concat('Database=', parameters('dbName'), ';')]",
+        "dbUser": "[concat('User Id=', parameters('dbUser'), ';')]",
+        "dbPassword": "[concat('Password=', parameters('dbPassword'), ';')]",
+        "connection": "[concat(variables('dbHost'), variables('dbName'), variables('dbUser'), variables('dbPassword'))]"
+        
+    },
+    "resources": [
+      {
+              "name": "[parameters('name')]",
+              "type": "Microsoft.ContainerInstance/containerGroups",
+              "apiVersion": "2017-08-01-preview",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                  "containers": [
+                      {
+                          "name": "[parameters('name')]",
+                          "properties": {
+                              "image": "[parameters('image')]",
+                              "environmentVariables": [
+                                {
+                                  "name": "CONNECTIONSTRING",
+                                  "value": "[variables('connection')]"
+                                }
+                              ],
+                              "resources": {
+                                  "requests": {
+                                      "cpu": "[variables('cpuCores')]",
+                                      "memoryInGb": "[variables('memoryInGb')]"
+                                  }
+                              }
+                          }
+                      }
+                  ],
+                  "osType": "Linux"
+              }
+          }
+    ],
+    "outputs": {
+       "containerIPv4Address":{
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups/', parameters('name'))).ipAddress.ip]"
+        }
+    }
+  }

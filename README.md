@@ -4,6 +4,13 @@ A Simple PowerShell Connection Test to ensure connectivity to a Database from a 
 
 ## Windows Container Usage
 
+### Automatic Deploy
+
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fdanielscholl%2Fsql-test-ps%2Fmaster%2Ftemplates%2Fazuredeploy.json" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
+
+
 Run the process directly
 
 ```powershell
